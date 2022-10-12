@@ -15,7 +15,14 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
 public class RpcClientProxy implements InvocationHandler {
-
+    @SuppressWarnings("unchecked")
+    public <T> T getService(Class<T> clazz) {
+        return (T) Proxy.newProxyInstance(
+                clazz.getClassLoader(),
+                new Class<?>[]{clazz},
+                this
+        );
+    }
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
@@ -44,8 +51,7 @@ public class RpcClientProxy implements InvocationHandler {
         if (!"1".equals(rpcResponse.getHeader())) {
             //报错提示等等 直接返回
         }
-        RpcResponse response=(RpcResponse)Utils.bytesToObject(rpcResponse.getBody());
-        Object object = Utils.bytesToObject(response.getBody());
+        Object object =  Utils.bytesToObject(rpcResponse.getBody());
         // 4、解析RpcResponse，也就是在解析rpc协议【protocol层】
 
         return object;
